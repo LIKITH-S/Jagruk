@@ -1,0 +1,77 @@
+# =============================================================================
+# docker-compose.yml — Predictive Service snippet
+# Intended to be merged into the top-level ecosystem docker-compose.
+# Run standalone: docker compose up predictive-service
+# =============================================================================
+
+services:
+
+  # ── Predictive Service ───────────────────────────────────────────────────────
+  predictive-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: disaster-alert/predictive-service:${APP_VERSION:-latest}
+    container_name: predictive-service
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${API_PORT:-8000}:8000"       # REST API
+      - "${METRICS_PORT:-9090}:9090"   # Prometheus scrape endpoint
+    volumes:
+      - predictive-artifacts:/app/artifacts   # persist trained model files
+      - predictive-logs:/app/logs
+      - ./data:/app/data:ro
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - disaster-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+
+  # ── Redis — prediction result cache ──────────────────────────────────────────
+  redis:
+    image: redis:7.2-alpine
+    container_name: predictive-redis
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379" 
+    volumes:
+      - redis-data:/data
+    networks:
+      - disaster-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+# ── Named volumes ─────────────────────────────────────────────────────────────
+volumes:
+  predictive-artifacts:
+  predictive-logs:
+  redis-data:
+
+# ── Shared network (attach other ecosystem services to this) ─────────────────
+networks:
+  disaster-net:
+    driver: bridge
