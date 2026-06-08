@@ -1,0 +1,14 @@
+[
+    {
+        "type": "Fire",
+        "before": "Keep extinguisher ready",
+        "during": "Evacuate immediately",
+        "after": "Call emergency services"
+    },
+    {
+        "type": "Flood",
+        "before": "Store clean water",
+        "during": "Move to higher ground",
+        "after": "Avoid contaminated water"
+    }
+]
