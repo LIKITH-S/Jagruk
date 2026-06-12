@@ -1,0 +1,17 @@
+{
+  "version": "cv_policy_v1.0",
+  "scoring_weights": {
+    "model_weight": 0.7,
+    "cv_weight": 0.3
+  },
+  "thresholds": {
+    "debris_ratio": 0.5,
+    "broken_edges": 0.5,
+    "collapse_features": 0.5
+  },
+  "confidence_floor": 0.05,
+  "fake_detection_thresholds": {
+    "ela_suspicion": 0.7,
+    "phash_distance": 10
+  }
+}
