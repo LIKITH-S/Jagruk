@@ -405,6 +405,3 @@ $env:PYTHONPATH="src"; pytest tests/test_models/test_training.py -v
 
 ### Architectural Commitment
 The MVP processes a **single current-state post-disaster image** and outputs a structural severity estimate. It does **NOT** perform pre/post comparison change detection. The xBD dataset is used purely as supervised training labels — only **post-disaster imagery** is used for model training.
-
----
-*Developed with Advanced agentic engineering practices for resilient computer vision deployment.*
